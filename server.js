@@ -1,24 +1,48 @@
 const port = Deno.args[0];
 const listener = Deno.listen({ port });
 const clients = new Map();
+const rooms = new Set();
 let clientId = 0;
 
-const sendResponseToAll = (clientId, response) => {
-  clients.forEach(async (value) => {
+const isRoomsAvailable = (currentRooms) =>
+  currentRooms.length === 0 || [...currentRooms.at(-1)].length === 2;
+
+const joinInRoom = (conn) => {
+  if (isRoomsAvailable([...rooms])) {
+    const room = new Set();
+    rooms.add(room);
+  }
+
+  return [...rooms].at(-1).add(conn);
+};
+
+const sendResponseToRoommates = (conn, clientId, response) => {
+  [...rooms].forEach((room) => {
+    if (room.has(conn)) {
+      console.log(room);
+      return sendResponseToAll(clientId, response, room);
+    }
+  });
+};
+
+const sendResponseToAll = (clientId, response, room) => {
+  [...room].forEach(async (value) => {
     const msg = `client ${clientId} : ${response}`;
-    await value.write(new TextEncoder().encode(msg));
+    console.log(value, `message:${msg}`);
+    await value.write(new TextEncoder().encode("hardcoded string"));
+    console.log("Message sent!");
   });
 };
 
 const handleConnection = async (conn, clientId) => {
+  joinInRoom(conn);
   clients.set(clientId, conn);
 
   for await (const chunk of conn.readable) {
     const req = new TextDecoder().decode(chunk);
-    // const response = `client ${clientId} : ${req}`;
-    const response = req;
+    const response = req; //handleReq()
     console.log(response);
-    sendResponseToAll(clientId, response);
+    sendResponseToRoommates(conn, clientId, response);
   }
 };
 

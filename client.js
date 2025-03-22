@@ -18,7 +18,7 @@ const sendRequest = async (conn) => {
   for await (const chunk of Deno.stdin.readable) {
     const msg = new TextDecoder().decode(chunk);
     if (msg.trim().toLowerCase() === "exit") break;
-    console.log(msg);
+    // console.log(msg);
     writer.write(chunk);
   }
   conn.close();
