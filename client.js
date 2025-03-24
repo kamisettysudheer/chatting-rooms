@@ -5,7 +5,7 @@ const readResponse = async (conn) => {
   try {
     for await (const chunk of conn.readable) {
       const msg = new TextDecoder().decode(chunk);
-      // console.log(msg);
+      console.log(msg);
     }
   } catch {
     console.log("disconnected the server");
@@ -18,7 +18,6 @@ const sendRequest = async (conn) => {
   for await (const chunk of Deno.stdin.readable) {
     const msg = new TextDecoder().decode(chunk);
     if (msg.trim().toLowerCase() === "exit") break;
-    // console.log(msg);
     writer.write(chunk);
   }
   conn.close();

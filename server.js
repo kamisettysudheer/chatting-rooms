@@ -29,7 +29,7 @@ const sendResponseToAll = (clientId, response, room) => {
   [...room].forEach(async (value) => {
     const msg = `client ${clientId} : ${response}`;
     console.log(value, `message:${msg}`);
-    await value.write(new TextEncoder().encode("hardcoded string"));
+    await value.write(new TextEncoder().encode(msg));
     console.log("Message sent!");
   });
 };
