@@ -1,6 +1,3 @@
-const port = Deno.args[0];
-const conn = await Deno.connect({ port });
-
 const readResponse = async (conn) => {
   try {
     for await (const chunk of conn.readable) {
@@ -17,11 +14,20 @@ const sendRequest = async (conn) => {
 
   for await (const chunk of Deno.stdin.readable) {
     const msg = new TextDecoder().decode(chunk);
-    if (msg.trim().toLowerCase() === "exit") break;
+
     writer.write(chunk);
+
+    if (msg.trim().toLowerCase() === "exit") break;
   }
   conn.close();
 };
 
-sendRequest(conn);
-readResponse(conn);
+const main = async () => {
+  const port = Deno.args[0];
+  const conn = await Deno.connect({ port });
+
+  sendRequest(conn);
+  readResponse(conn);
+};
+
+main();
